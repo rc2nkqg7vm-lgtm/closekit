@@ -48,14 +48,14 @@ export async function POST(req: NextRequest) {
       notes: doc.notes ?? "",
     };
 
-    const buffer = await renderToBuffer(
-      React.createElement(InvoicePDF, {
-        doc: docData,
-        profile: resolvedProfile,
-        client,
-        watermark: shouldWatermark,
-      })
-    );
+    const element = React.createElement(InvoicePDF, {
+      doc: docData,
+      profile: resolvedProfile,
+      client,
+      watermark: shouldWatermark,
+    }) as any;
+
+    const buffer = await renderToBuffer(element);
 
     return new NextResponse(buffer, {
       headers: {
