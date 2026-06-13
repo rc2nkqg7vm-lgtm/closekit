@@ -1,0 +1,16 @@
+/* Prose/article styles for blog posts — add to globals.css or keep separate */
+.prose h2 {
+  @apply text-lg font-semibold text-foreground mt-6 mb-2;
+}
+.prose p {
+  @apply text-sm text-muted-foreground leading-relaxed mb-3;
+}
+.prose ul, .prose ol {
+  @apply text-sm text-muted-foreground space-y-1 pl-5 mb-3;
+}
+.prose ul { @apply list-disc; }
+.prose ol { @apply list-decimal; }
+.prose li { @apply leading-relaxed; }
+.prose strong { @apply font-semibold text-foreground; }
+.prose a { @apply text-indigo-400 hover:text-indigo-300 underline underline-offset-2; }
+.prose .lead { @apply text-base text-muted-foreground/90 leading-relaxed mb-5; }
