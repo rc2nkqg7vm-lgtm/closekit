@@ -8,60 +8,20 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { free, document: doc, profile, toName, toCompany, toEmail, toAddress, fromName } = body;
-
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-
     let shouldWatermark = free === true;
-
     if (user) {
       const { data: dbProfile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
       shouldWatermark = dbProfile?.plan === "free";
     }
-
-    const client = toName ? {
-      id: "anon",
-      user_id: "",
-      name: toName ?? "",
-      email: toEmail ?? null,
-      company: toCompany ?? null,
-      address: toAddress ?? null,
-      created_at: "",
-    } : null;
-
-    const resolvedProfile = profile ?? {
-      id: user?.id ?? "anon",
-      email: fromName ?? "CloseKit User",
-      plan: shouldWatermark ? "free" : "pro",
-      stripe_customer_id: null,
-      docs_this_month: 0,
-      brand_logo_url: null,
-      brand_color: "#6366f1",
-    };
-
-    const docData = {
-      ...doc,
-      line_items: doc.line_items ?? [],
-      tax_rate: doc.tax_rate ?? 0,
-      notes: doc.notes ?? "",
-    };
-
-    const element = React.createElement(InvoicePDF, {
-      doc: docData,
-      profile: resolvedProfile,
-      client,
-      watermark: shouldWatermark,
-    }) as any;
-
+    const client = toName ? { id: "anon", user_id: "", name: toName ?? "", email: toEmail ?? null, company: toCompany ?? null, address: toAddress ?? null, created_at: "" } : null;
+    const resolvedProfile = profile ?? { id: user?.id ?? "anon", email: fromName ?? "CloseKit User", plan: shouldWatermark ? "free" : "pro", stripe_customer_id: null, docs_this_month: 0, brand_logo_url: null, brand_color: "#6366f1" };
+    const docData = { ...doc, line_items: doc.line_items ?? [], tax_rate: doc.tax_rate ?? 0, notes: doc.notes ?? "" };
+    const element = React.createElement(InvoicePDF, { doc: docData, profile: resolvedProfile, client, watermark: shouldWatermark }) as any;
     const pdfBuffer = await renderToBuffer(element);
     const uint8 = new Uint8Array(pdfBuffer);
-
-    return new NextResponse(uint8, {
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="document.pdf"`,
-      },
-    });
+    return new NextResponse(uint8, { headers: { "Content-Type": "application/pdf", "Content-Disposition": "attachment; filename=document.pdf" } });
   } catch (error) {
     console.error("PDF error:", error);
     return NextResponse.json({ error: "Failed to generate PDF" }, { status: 500 });
