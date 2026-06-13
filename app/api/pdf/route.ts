@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { free, document: doc, profile, toName, toCompany, toEmail, toAddress, fromName } = body;
 
-    // Server-side plan enforcement: if authenticated, check plan
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -20,7 +19,6 @@ export async function POST(req: NextRequest) {
       shouldWatermark = dbProfile?.plan === "free";
     }
 
-    // Build client info from body
     const client = toName ? {
       id: "anon",
       user_id: "",
@@ -55,9 +53,10 @@ export async function POST(req: NextRequest) {
       watermark: shouldWatermark,
     }) as any;
 
-    const buffer = await renderToBuffer(element);
+    const pdfBuffer = await renderToBuffer(element);
+    const uint8 = new Uint8Array(pdfBuffer);
 
-    return new NextResponse(buffer as unknown as BodyInit, {
+    return new NextResponse(uint8, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="document.pdf"`,
