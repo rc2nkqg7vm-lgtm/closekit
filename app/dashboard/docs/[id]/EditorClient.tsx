@@ -44,7 +44,7 @@ export function EditorClient({ doc, profile, clients }: Props) {
 
   const save = useCallback(async () => {
     setSaving(true);
-    await supabase.from("documents").update({
+    await (supabase.from("documents") as any).update({
       title, status, client_id: clientId || null,
       line_items: items as any, tax_rate: taxRate, notes,
     }).eq("id", doc.id);
