@@ -25,7 +25,7 @@ export function SettingsClient({ profile }: Props) {
   async function save() {
     setSaving(true);
     const client = createClient();
-    await client.from("profiles").update({ brand_color: brandColor, brand_logo_url: logoUrl || null }).eq("id", profile!.id);
+   await (client.from("profiles") as any).update({ brand_color: brandColor, brand_logo_url: logoUrl || null }).eq("id", profile!.id);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
